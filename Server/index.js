@@ -5,13 +5,13 @@ const app = express()
 const http = require('http')
 const server = http.createServer(app)
 
-//Sử dụng socket.io
-// const{Server} = require('socket.io')
-// const io = new Server(server)
-const io = require('socket.io')(server, {
-    transport: ['polling'],
-    timeout: 3000
-});
+//Sử dụng socket.io để viết websocket
+const{Server} = require('socket.io')
+const io = new Server(server)
+// const io = require('socket.io')(server, {
+//     transport: ['websocket'],
+//     timeout: 3000
+// });
 
 //tạo đường dẫn web trả về
 app.get('/', (req, res) => {
@@ -19,34 +19,31 @@ app.get('/', (req, res) => {
 })
 
 
-//Tạo kết nối
+//Tạo kết nối websocket
 io.on('connection', (socket) => {
     console.log('Client connected');
 
-    // dataSchema.find().then(result => {
-    //     socket.emit('on-btn', result)
-    // })
-
-    socket.on('on-chat', message => {
+    //Kênh nhận lời chào từ esp
+    socket.on('user-chat', message => {
         console.log(message)
         //gửi tới toàn bộ client
         io.emit('user-chat', message)
     });
 
+    //Kênh điều khiển led
     socket.on('on-btn', led => {
         console.log(led);
 
         io.emit('on-btn', led)
     });
 
-    socket.on('event_name', message => {
-        console.log(message);
-
-        io.emit('user-chat', message)
+    //Ngắt két nối
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
     });
 
 })
 
-server.listen(8080, () => {
-    console.log('Listenning on port 4200')
+server.listen(3000, () => {
+    console.log('Listenning on port 3000')
 })

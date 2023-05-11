@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebSocket Chat</title>
+  <title>WebSocket_TTIOT</title>
   <link rel="stylesheet" href="style.css">
 
   <style>
@@ -43,11 +43,13 @@
   </style>
 </head>
 <body>
-    <h1>App chat</h1>
-    <ul id="messages"></ul>
-  <input type="text" id="message" />
-  <button onclick="sendMessage()">Send</button>
+  <h1>Demo Websocket</h1>
+  <h2>Receive Esp</h2>
+  <ul id="messages"></ul>
+  <!-- <input type="text" id="message" /> -->
+  <!-- <button onclick="sendMessage()">Send</button> -->
 
+  <h2>Led Control</h2>
   <div id="id-btn" class="btn">
     <input  onchange="handle()" type="checkbox" class="switch-toggle" id="switchtoggle-js">
   </div>
@@ -60,12 +62,12 @@
     const socket = io();
 
 
-    function sendMessage() {
-      const input = document.getElementById('message');
-      const message = input.value;
-      input.value = '';  //Làm trống ô input sau khi gửi
-      socket.emit('on-chat', message)
-    }
+    // function sendMessage() {
+    //   const input = document.getElementById('message');
+    //   const message = input.value;
+    //   input.value = '';  //Làm trống ô input sau khi gửi
+    //   socket.emit('on-chat', message)
+    // }
 
     //Hiển thị
     const messages = document.querySelector('#messages');
