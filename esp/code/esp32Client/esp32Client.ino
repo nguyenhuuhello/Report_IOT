@@ -46,7 +46,7 @@ SocketIOclient socketIO;
 //LED/////////
 //////////////
 const int ledPin = LED_BUILTIN;
-int ledState = 0;
+static int ledState = 0;
 
 
 
@@ -170,15 +170,14 @@ void setup() {
     //216.24.57.253
     //http://216.24.57.253:443/
     //216.24.57.253:443
-    //Connect to serveroutput
-    //13.228.225.19
-    //18.142.128.26
-    //54.254.162.138
     // if (client.connect("test-esp-server-1.onrender.com", 443)) {
     //     socketIO.beginSSL(client, "test-esp-server-1.onrender");
     // }
 
-    socketIO.begin("216.24.57.253", 443, "/socket.io/?EIO=4");
+    //http://127.0.0.1:3000/
+    //192.168.43.160:3000
+
+    socketIO.begin("192.168.43.160", 3000, "/socket.io/?EIO=4");
 
     // event handler
     socketIO.onEvent(socketIOEvent);
@@ -198,7 +197,7 @@ void loop() {
     //Gủi lời chào tới server
     uint64_t now = millis();
 
-    if(now - messageTimestamp > 2000) {
+    if(now - messageTimestamp > 30000) {
         messageTimestamp = now;
 
         // creat JSON message for Socket.IO (event)
@@ -207,7 +206,7 @@ void loop() {
 
         // add evnet name
         // Hint: socket.on('event_name', ....
-        array.add("on-chat");
+        array.add("user-chat");
         array.add("Hello from ESP32");
 
 
