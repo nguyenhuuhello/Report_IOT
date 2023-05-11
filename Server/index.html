@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Chat</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+  .switch-toggle {
+    width: 90px;
+    height: 50px;
+    appearance: none;
+    background: #F9F5F5;
+
+    border: 1px solid gray;
+    border-radius: 27px;
+    position: relative;
+    /* Khi di chuyển chuột tới thì chuyển thành hình cái tay */
+    cursor: pointer;
+
+}
+/* lớp giả cho hình tròn */
+.switch-toggle::before {
+    content: "";
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    margin-top: 3px;
+    margin-left: 3px;
+    background: white;
+
+    border: 1px solid gray;
+    border-radius: 50%;
+    transition: 0.5s;
+}
+.switch-toggle:checked {
+    background: #2400FF;
+}
+/* Di chuyển hình tròn */
+.switch-toggle:checked:before {
+    margin-left: 42px;
+    /* z-index: ; */
+}
+  </style>
+</head>
+<body>
+    <h1>App chat</h1>
+    <ul id="messages"></ul>
+  <input type="text" id="message" />
+  <button onclick="sendMessage()">Send</button>
+
+  <div id="id-btn" class="btn">
+    <input  onchange="handle()" type="checkbox" class="switch-toggle" id="switchtoggle-js">
+  </div>
+
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    //Tạo socket tới server
+    const socket = io();
+
+
+    function sendMessage() {
+      const input = document.getElementById('message');
+      const message = input.value;
+      input.value = '';  //Làm trống ô input sau khi gửi
+      socket.emit('on-chat', message)
+    }
+
+    //Hiển thị
+    const messages = document.querySelector('#messages');
+    socket.on('user-chat',(message) => {
+      
+        const chat = document.createElement('li');
+        chat.textContent = message;
+
+        messages.appendChild(chat);
+    });
+  
+
+    // const checkbox = document.getElementById('switchtoggle-js');
+
+    // checkbox.addEventListener('change', (event) => {
+    //     const isChecked = event.checked;
+    //     io.emit('checkbox_change', isChecked);
+    // });
+
+    function handle()
+    {
+      const  input = document.querySelector('#switchtoggle-js');
+      const message = input.checked;
+      //gửi data về server
+      socket.emit('on-btn', message);
+      
+      //nhận dữ liệu từ server, set lại giá trị
+      socket.on('on-btn', message => {
+      input.checked = message;
+      });
+    }
+    
+  </script>
+</body>
+</html>

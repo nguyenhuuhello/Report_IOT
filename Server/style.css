@@ -1,0 +1,35 @@
+.switch-toggle {
+    width: 90px;
+    height: 50px;
+    appearance: none;
+    background: #F9F5F5;
+
+    border: 1px solid gray;
+    border-radius: 27px;
+    position: relative;
+    /* Khi di chuyển chuột tới thì chuyển thành hình cái tay */
+    cursor: pointer;
+
+}
+/* lớp giả cho hình tròn */
+.switch-toggle::before {
+    content: "";
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    margin-top: 3px;
+    margin-left: 3px;
+    background: white;
+
+    border: 1px solid gray;
+    border-radius: 50%;
+    transition: 0.5s;
+}
+.switch-toggle:checked {
+    background: #2400FF;
+}
+/* Di chuyển hình tròn */
+.switch-toggle:checked:before {
+    margin-left: 42px;
+    /* z-index: ; */
+}
