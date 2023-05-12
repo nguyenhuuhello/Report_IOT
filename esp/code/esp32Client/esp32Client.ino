@@ -1,10 +1,3 @@
-/*
- * WebSocketClientSocketIOack.ino
- *
- *  Created on: 20.07.2019
- *
- */
-
 #include <Arduino.h>
 
 #include <WiFi.h>
@@ -15,31 +8,11 @@
 
 #include <WebSocketsClient.h>
 #include <SocketIOclient.h>
-// SocketIOclient
-
-
-// WiFiClientSecure client;
-
 
 WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
 
 #define USE_SERIAL Serial
-
-// const char* rootCACertificate =
-//   "-----BEGIN CERTIFICATE-----\n"
-//   "MIIDajCCAlICCQD7y6Uay6f2JzANBgkqhkiG9w0BAQsFADBqMQswCQYDVQQGEwJV\n"
-//   "UzELMAkGA1UECAwCQ0ExEjAQBgNVBAcMCVN0YXRlIFN1YnN0b24xDTALBgNVBAoM\n"
-//   "BENvbXBhbnkxHjAcBgNVBAMMFU15IFNlcnZlciBDb21wYW55IENBMB4XDTIxMDcx\n"
-//   "NjAwMTA0MloXDTIyMDcxNTAwMTA0MlowajELMAkGA1UEBhMCVVMxCzAJBgNVBAgM\n"
-//   "AkNBMRIwEAYDVQQHDAlTdGF0ZSBTdWJzdG9uMQ0wCwYDVQQKDARDb21wYW55MR4w\n"
-//   "HAYDVQQDDBVNeSBTZXJ2ZXIgQ29tcGFueTCCASIwDQYJKoZIhvcNAQEBBQADggEP\n"
-//   "ADCCAQoCggEBANHuyRpT2fc7Db9UmyqJXsk+0TtQFfgzClyW8UzIh3vebe1izCCs\n"
-//   "MORi24ZIDo6Ym3n9cvugUKPLHdAEx4LULuglTQZjFJhvWhM8jdyMg5T/h+/eR9ss\n"
-//   "GgIzBrWuByp/zAmZ0nV8w6DShfOhuSp2/SmSd2zLNGg9gF4yDaFO8lb+1qDqjtD2\n"
-//   "cd8u2aTbM6AlK1mHsDqJzj12o+zSpwVw3JqGFSzUJSpJiAyIyUDle2zqvpGrrci2\n"
-//   "S1bI7r7bZRhFgUzhBd2l/VlOHv5dxS6FFMtv0mFGWtpduyXuY\n"
-//   "-----END CERTIFICATE-----\n";
 
 
 /////////////
@@ -137,9 +110,6 @@ void setup() {
     //controll Led
     pinMode(ledPin, OUTPUT);
 
-    // client.setCACert(rootCACertificate);
-
-
     //USE_SERIAL.begin(921600);
     USE_SERIAL.begin(115200);
 
@@ -163,6 +133,7 @@ void setup() {
         delay(100);
     }
 
+    //Kết nối tới Wifi
     String ip = WiFi.localIP().toString();
     USE_SERIAL.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
 
@@ -171,16 +142,13 @@ void setup() {
     //216.24.57.253
     //http://216.24.57.253:443/
     //216.24.57.253:443
-    // if (client.connect("test-esp-server-1.onrender.com", 443)) {
-    //     socketIO.beginSSL(client, "test-esp-server-1.onrender");
-    // }
 
     //http://127.0.0.1:3000/
     //192.168.43.160:3000
-
+    //Kết nối tới server
     socketIO.begin("192.168.43.160", 3000, "/socket.io/?EIO=4");
 
-    // event handler
+    // Xử lý sự kiện 
     socketIO.onEvent(socketIOEvent);
 
 }
@@ -195,35 +163,32 @@ void loop() {
     digitalWrite(ledPin, ledState);
 
 
-    //Gủi lời chào tới server
+    //Gủi lời chào tới server mỗi 30s/lần
     uint64_t now = millis();
 
     if(now - messageTimestamp > 30000) {
         messageTimestamp = now;
 
-        // creat JSON message for Socket.IO (event)
+        //Tạo gói tin Json cho Socket.io
         DynamicJsonDocument doc(1024);
         JsonArray array = doc.to<JsonArray>();
 
-        // add evnet name
-        // Hint: socket.on('event_name', ....
+        //Thêm kênh
         array.add("user-chat");
+        //Thêm nội dung gửi tới kênh
         array.add("Hello from ESP32");
 
 
         // JsonObject objectEvent = array.createNestedObject();
         // objectEvent["event_name"] = "Hello from ESP32";
-        
-        
 
         // JSON to String (serializion)
         String output;
         serializeJson(doc, output);
 
-        // Send event
+        // Gửi gói tin
         socketIO.sendEVENT(output);
 
-        // Print output to serial
         USE_SERIAL.println(output);
     }
 
