@@ -1,3 +1,4 @@
+//Sử dụng express để tạo route
 const express = require('express')
 const app = express()
 
@@ -14,6 +15,7 @@ const io = new Server(server)
 // });
 
 //tạo đường dẫn web trả về
+//Đường dẫn này sẽ render trang web điều khiển của chúng ta
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 })
@@ -23,17 +25,17 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('Client connected');
 
-    //Kênh nhận lời chào từ esp
+    //Tạo kênh nhận lời chào từ esp
     socket.on('user-chat', message => {
+        //In ra lời chào ở server
         console.log(message)
         //gửi tới toàn bộ client
         io.emit('user-chat', message)
     });
 
-    //Kênh điều khiển led
+    //Tạo kênh điều khiển led
     socket.on('on-btn', led => {
         console.log(led);
-
         io.emit('on-btn', led)
     });
 
@@ -41,7 +43,6 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
-
 })
 
 server.listen(3000, () => {

@@ -46,8 +46,6 @@
   <h1>Demo Websocket</h1>
   <h2>Receive Esp</h2>
   <ul id="messages"></ul>
-  <!-- <input type="text" id="message" /> -->
-  <!-- <button onclick="sendMessage()">Send</button> -->
 
   <h2>Led Control</h2>
   <div id="id-btn" class="btn">
@@ -61,18 +59,11 @@
     //Tạo socket tới server
     const socket = io();
 
-
-    // function sendMessage() {
-    //   const input = document.getElementById('message');
-    //   const message = input.value;
-    //   input.value = '';  //Làm trống ô input sau khi gửi
-    //   socket.emit('on-chat', message)
-    // }
-
-    //Hiển thị
+    //Hiển thị lời chào từ Esp
     const messages = document.querySelector('#messages');
+    //Sau mỗi lần nhận dữ liệu từ esp thì sẽ tạo 1 thẻ con và in ra nội dung nhận được
     socket.on('user-chat',(message) => {
-      
+        
         const chat = document.createElement('li');
         chat.textContent = message;
 
@@ -80,16 +71,10 @@
     });
   
 
-    // const checkbox = document.getElementById('switchtoggle-js');
-
-    // checkbox.addEventListener('change', (event) => {
-    //     const isChecked = event.checked;
-    //     io.emit('checkbox_change', isChecked);
-    // });
-
     function handle()
     {
       const  input = document.querySelector('#switchtoggle-js');
+      //Lấy giá trị của button
       const message = input.checked;
       //gửi data về server
       socket.emit('on-btn', message);

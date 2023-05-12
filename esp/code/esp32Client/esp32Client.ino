@@ -44,6 +44,7 @@ SocketIOclient socketIO;
 
 /////////////
 //LED/////////
+//Sử dụng led trên board để hiển thị
 //////////////
 const int ledPin = LED_BUILTIN;
 static int ledState = 0;
