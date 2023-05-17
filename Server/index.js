@@ -14,6 +14,8 @@ const io = new Server(server)
 //     timeout: 3000
 // });
 
+const clients = {};
+
 //tạo đường dẫn web trả về
 //Đường dẫn này sẽ render trang web điều khiển của chúng ta
 app.get('/', (req, res) => {
@@ -30,7 +32,16 @@ io.on('connection', (socket) => {
         //In ra lời chào ở server
         console.log(message)
         //gửi tới toàn bộ client
-        io.emit('user-chat', message)
+        // io.emit('user-chat', message)
+        // Lưu trạng thái của client
+        clients[socket.id] = true;
+
+        // gửi tới toàn bộ client, trừ client gửi lên server
+        Object.keys(clients).forEach(clientId => {
+            if (clientId !== socket.id) {
+            io.to(clientId).emit('user-chat', message);
+            }
+        });
     });
 
     //Tạo kênh điều khiển led
@@ -45,6 +56,6 @@ io.on('connection', (socket) => {
     });
 })
 
-server.listen(3000, () => {
-    console.log('Listenning on port 3000')
+server.listen(4200, () => {
+    console.log('Listenning on port 4200')
 })
