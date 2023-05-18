@@ -63,10 +63,11 @@
     const messages = document.querySelector('#messages');
     //Sau mỗi lần nhận dữ liệu từ esp thì sẽ tạo 1 thẻ con và in ra nội dung nhận được
     socket.on('user-chat',(message) => {
-        
+        //Tạo thẻ li mới
         const chat = document.createElement('li');
+        //Thêm nội dung
         chat.textContent = message;
-
+        //Chèn vào danh sách
         messages.appendChild(chat);
     });
   
@@ -81,10 +82,10 @@
       
       //nhận dữ liệu từ server, set lại giá trị
       socket.on('on-btn', message => {
-      input.checked = message;
+          input.checked = message;
       });
     }
-    
+  
   </script>
 </body>
 </html>

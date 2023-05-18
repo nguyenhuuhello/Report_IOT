@@ -15,16 +15,9 @@ SocketIOclient socketIO;
 
 #define USE_SERIAL Serial
 
-
-/////////////
-//LED/////////
-//Sử dụng led trên board để hiển thị
-//////////////
+//Điều khiển led
 const int ledPin = LED_BUILTIN;
-bool temp_ledState;
 
-
-bool update_ledState = false;
 String globalValue;
 
 bool receivedValueFromServer = false;
@@ -40,7 +33,6 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length)
             //Kết nối tới server
             USE_SERIAL.printf("[IOc] Connected to url: %s\n", payload);
 
-            // join default namespace (no auto join in Socket.IO V3)
             socketIO.send(sIOtype_CONNECT, "/");
             break;
 
@@ -67,10 +59,8 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length)
             String value = doc[1];
             USE_SERIAL.printf("[IOc] value: %s\n", value.c_str());
 
-            //led
+            //Lấy giá trị của button
             globalValue = value;
-            // update_ledState = getValueLed(value);
-            bool receivedValueFromServer = true;
 
             //Kiểm tra có chưa ID ACK từ server hay không, nếu có thì phản hổi về server
             if(id) {
@@ -108,11 +98,6 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length)
 }
 
 bool getValueLed(String value){
-  // if(value == "true"){
-  //   return 1;
-  // } 
-  // else 
-  //   return 0;
   if(value == "true")
     {return 1;}
   else {
@@ -122,14 +107,11 @@ bool getValueLed(String value){
 
 
 void setup() {
-    //controll Led
-    
+    //controll Led  
     pinMode(ledPin, OUTPUT);
 
-    //USE_SERIAL.begin(921600);
     USE_SERIAL.begin(115200);
 
-    //Serial.setDebugOutput(true);
     USE_SERIAL.setDebugOutput(true);
 
     USE_SERIAL.println();
@@ -153,8 +135,9 @@ void setup() {
     String ip = WiFi.localIP().toString();
     USE_SERIAL.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
 
-    // server address, port and URL: http://103.163.119.63:4200/
+    // server address, port and URL:
     //103.163.119.124:4200
+    //192.168.43.160 local
 
     //Kết nối tới server
     socketIO.begin("103.163.119.124", 4200, "/socket.io/?EIO=4");
@@ -164,22 +147,18 @@ void setup() {
 }
 
 unsigned long messageTimestamp = 0;
-// bool ledState = temp_ledState;
+
 bool ledState = 0;
 void loop() {
   //loop để giữ kết nối
     socketIO.loop();
-    // if(receivedValueFromServer)
-    // {
-    //   ledState = getValueLed(globalValue);
-    //   // receivedValueFromServer = false;
-    // }
+
     ledState = getValueLed(globalValue);
     //led
     digitalWrite(ledPin, ledState);
 
 
-    // Gủi lời chào tới server mỗi 30s/lần
+    // Gủi lời chào tới server mỗi 5s/1lần
     uint64_t now = millis();
 
     if(now - messageTimestamp > 5000) {
@@ -197,11 +176,7 @@ void loop() {
         //Thêm nội dung gửi tới kênh
         array.add("Hello from ESP32");
 
-
-        // JsonObject objectEvent = array.createNestedObject();
-        // objectEvent["event_name"] = "Hello from ESP32";
-
-        // JSON to String (serializion)
+        
         String output;
         //chuyển đổi đối tượng JSON thành chuỗi JSON - output 
         serializeJson(doc, output);
@@ -209,11 +184,6 @@ void loop() {
         // Gửi gói tin
         socketIO.sendEVENT(output);
 
-
         USE_SERIAL.println(output);
-
-        USE_SERIAL.println(temp_ledState);
-        USE_SERIAL.println(ledState);
     }
-
 }

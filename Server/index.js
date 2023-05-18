@@ -9,18 +9,12 @@ const server = http.createServer(app)
 //Sử dụng socket.io để viết websocket
 const{Server} = require('socket.io')
 const io = new Server(server)
-// const io = require('socket.io')(server, {
-//     transport: ['websocket'],
-//     timeout: 3000
-// });
-
-const clients = [];
 
 //tạo đường dẫn web trả về
 //Đường dẫn này sẽ render trang web điều khiển của chúng ta
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
-})
+});
 
 
 //Tạo kết nối websocket
@@ -31,34 +25,15 @@ io.on('connection', (socket) => {
     socket.on('user-chat', message => {
         //In ra lời chào ở server
         console.log(message);
-
-        //Thêm client vừa gửi tới server vào danh sách
-        clients.push(socket.id);
-        //gửi tới toàn bộ client
-        // io.emit('user-chat', message)
-        // Lưu trạng thái của client
-        // clients[socket.id] = true;
-
-        // gửi tới toàn bộ client, trừ client gửi lên server
-        // Object.keys(clients).forEach(clientId => {
-        //     if (clientId !== socket.id) {
-        //     io.to(clientId).emit('user-chat', message);
-        //     }
-        // });
-
-        clients.forEach((client) => {
-            if (client !== socket.id) {
-              io.to(client).emit('user-chatt', message);
-            }
-          });
-          //xóa phần tử khỏi danh sách
-          clients.pop();
+        //gửi đến tất cả các kết nối trừ kết nối gốc
+        socket.broadcast.emit('user-chat', message);
     });
 
     //Tạo kênh điều khiển led
     socket.on('on-btn', led => {
         console.log(led);
-        io.emit('on-btn', led)
+        //gửi tới toàn bộ các kết nối
+        io.emit('on-btn', led);
     });
 
     //Ngắt két nối
