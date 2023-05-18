@@ -1,3 +1,4 @@
+// #include <stdio.h>
 #include <Arduino.h>
 
 #include <WiFi.h>
@@ -20,8 +21,13 @@ SocketIOclient socketIO;
 //Sử dụng led trên board để hiển thị
 //////////////
 const int ledPin = LED_BUILTIN;
-static int ledState = 0;
+bool temp_ledState;
 
+
+bool update_ledState = false;
+String globalValue;
+
+bool receivedValueFromServer = false;
 
 
 void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
@@ -41,6 +47,7 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length)
         //Nhận dữ liệu từ server    
         case sIOtype_EVENT:
         {
+            USE_SERIAL.printf("Recive from server");
             char * sptr = NULL;
             int id = strtol((char *)payload, &sptr, 10);
             USE_SERIAL.printf("[IOc] get event: %s id: %d\n", payload, id);
@@ -61,15 +68,11 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length)
             USE_SERIAL.printf("[IOc] value: %s\n", value.c_str());
 
             //led
-            if(value == "true"){
-                ledState = 1;
-            } 
-            else {
-                ledState = 0;
-            }
+            globalValue = value;
+            // update_ledState = getValueLed(value);
+            bool receivedValueFromServer = true;
 
-
-            // Message Includes a ID for a ACK (callback)
+            //Kiểm tra có chưa ID ACK từ server hay không, nếu có thì phản hổi về server
             if(id) {
                 // creat JSON message for Socket.IO (ack)
                 DynamicJsonDocument docOut(1024);
@@ -104,10 +107,23 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length)
     }
 }
 
+bool getValueLed(String value){
+  // if(value == "true"){
+  //   return 1;
+  // } 
+  // else 
+  //   return 0;
+  if(value == "true")
+    {return 1;}
+  else {
+    return 0;
+  }
+}
 
 
 void setup() {
     //controll Led
+    
     pinMode(ledPin, OUTPUT);
 
     //USE_SERIAL.begin(921600);
@@ -138,35 +154,38 @@ void setup() {
     USE_SERIAL.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
 
     // server address, port and URL: http://103.163.119.63:4200/
-    //https://test-esp-server-1.onrender.com
-    //216.24.57.253
-    //http://216.24.57.253:443/
-    //216.24.57.253:443
+    //103.163.119.124:4200
 
-    //http://127.0.0.1:3000/
-    //192.168.43.160:3000
     //Kết nối tới server
-    socketIO.begin("192.168.43.160", 3000, "/socket.io/?EIO=4");
+    socketIO.begin("103.163.119.124", 4200, "/socket.io/?EIO=4");
 
     // Xử lý sự kiện 
     socketIO.onEvent(socketIOEvent);
-
 }
 
 unsigned long messageTimestamp = 0;
-
+// bool ledState = temp_ledState;
+bool ledState = 0;
 void loop() {
   //loop để giữ kết nối
     socketIO.loop();
-
+    // if(receivedValueFromServer)
+    // {
+    //   ledState = getValueLed(globalValue);
+    //   // receivedValueFromServer = false;
+    // }
+    ledState = getValueLed(globalValue);
     //led
     digitalWrite(ledPin, ledState);
 
 
-    //Gủi lời chào tới server mỗi 30s/lần
+    // Gủi lời chào tới server mỗi 30s/lần
     uint64_t now = millis();
 
-    if(now - messageTimestamp > 30000) {
+    if(now - messageTimestamp > 5000) {
+
+        USE_SERIAL.println(temp_ledState);
+        USE_SERIAL.println(ledState);
         messageTimestamp = now;
 
         //Tạo gói tin Json cho Socket.io
@@ -184,12 +203,17 @@ void loop() {
 
         // JSON to String (serializion)
         String output;
+        //chuyển đổi đối tượng JSON thành chuỗi JSON - output 
         serializeJson(doc, output);
 
         // Gửi gói tin
         socketIO.sendEVENT(output);
 
+
         USE_SERIAL.println(output);
+
+        USE_SERIAL.println(temp_ledState);
+        USE_SERIAL.println(ledState);
     }
 
 }

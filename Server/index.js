@@ -14,7 +14,7 @@ const io = new Server(server)
 //     timeout: 3000
 // });
 
-const clients = {};
+const clients = [];
 
 //tạo đường dẫn web trả về
 //Đường dẫn này sẽ render trang web điều khiển của chúng ta
@@ -30,18 +30,29 @@ io.on('connection', (socket) => {
     //Tạo kênh nhận lời chào từ esp
     socket.on('user-chat', message => {
         //In ra lời chào ở server
-        console.log(message)
+        console.log(message);
+
+        //Thêm client vừa gửi tới server vào danh sách
+        clients.push(socket.id);
         //gửi tới toàn bộ client
         // io.emit('user-chat', message)
         // Lưu trạng thái của client
-        clients[socket.id] = true;
+        // clients[socket.id] = true;
 
         // gửi tới toàn bộ client, trừ client gửi lên server
-        Object.keys(clients).forEach(clientId => {
-            if (clientId !== socket.id) {
-            io.to(clientId).emit('user-chat', message);
+        // Object.keys(clients).forEach(clientId => {
+        //     if (clientId !== socket.id) {
+        //     io.to(clientId).emit('user-chat', message);
+        //     }
+        // });
+
+        clients.forEach((client) => {
+            if (client !== socket.id) {
+              io.to(client).emit('user-chatt', message);
             }
-        });
+          });
+          //xóa phần tử khỏi danh sách
+          clients.pop();
     });
 
     //Tạo kênh điều khiển led
