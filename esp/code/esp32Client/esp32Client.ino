@@ -163,8 +163,6 @@ void loop() {
 
     if(now - messageTimestamp > 5000) {
 
-        USE_SERIAL.println(temp_ledState);
-        USE_SERIAL.println(ledState);
         messageTimestamp = now;
 
         //Tạo gói tin Json cho Socket.io
