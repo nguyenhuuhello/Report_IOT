@@ -137,7 +137,8 @@ void setup() {
 
     // server address, port and URL:
     //103.163.119.124:4200
-    //192.168.43.160 local
+    //Đối với việc chạy local, mở Terminal và gõ câu lệnh "ipconfig" để lấy địa chỉ
+    //IPv4 của Wifi, vẫn giữ nguyên port là 4200
 
     //Kết nối tới server
     socketIO.begin("103.163.119.124", 4200, "/socket.io/?EIO=4");
