@@ -35,6 +35,7 @@ io.on('connection', (socket) => {
         //gửi tới toàn bộ các kết nối
         io.emit('on-btn', led);
     });
+    
 
     //Ngắt két nối
     socket.on('disconnect', () => {
