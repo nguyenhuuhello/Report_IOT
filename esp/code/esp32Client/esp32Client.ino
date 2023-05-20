@@ -20,7 +20,6 @@ const int ledPin = LED_BUILTIN;
 
 String globalValue;
 
-bool receivedValueFromServer = false;
 
 
 void socketIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
